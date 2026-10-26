@@ -1,0 +1,78 @@
+[gd_scene load_steps=9 format=3 uid="uid://bho2wdif4ck7u"]
+
+[ext_resource type="PackedScene" uid="uid://crsupvt0rlyq5" path="res://board.tscn" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://c35vdxxlg7ot5" path="res://game.gd" id="1_e2o6t"]
+[ext_resource type="Script" uid="uid://cbveqa7r1gkuf" path="res://turn_manager.gd" id="2_fc0e3"]
+[ext_resource type="Script" uid="uid://bqrcyqaxo6mda" path="res://player_controller.gd" id="3_7jktm"]
+[ext_resource type="Script" uid="uid://c5e4yiyua4asw" path="res://piece_manager.gd" id="3_eow3j"]
+[ext_resource type="PackedScene" uid="uid://b4gkp3c6dqwpt" path="res://Knight.tscn" id="3_feb5d"]
+[ext_resource type="Script" uid="uid://c2fhxnlw4ne6m" path="res://opponent_controller.gd" id="4_ryrav"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_7jktm"]
+load_path = "res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_e2o6t")
+
+[node name="TurnManager" type="Node" parent="."]
+script = ExtResource("2_fc0e3")
+
+[node name="PieceManager" type="Node" parent="."]
+script = ExtResource("3_eow3j")
+
+[node name="PlayerController" type="Node" parent="."]
+script = ExtResource("3_7jktm")
+
+[node name="OpponentController" type="Node" parent="."]
+script = ExtResource("4_ryrav")
+
+[node name="OpponentAI" type="Node" parent="OpponentController"]
+
+[node name="Board" parent="." instance=ExtResource("1_80nbo")]
+position = Vector2(360, 640)
+scale = Vector2(4, 4)
+
+[node name="Knight" parent="." instance=ExtResource("3_feb5d")]
+position = Vector2(231, 440)
+scale = Vector2(0.5, 0.5)
+
+[node name="Opponent" parent="." instance=ExtResource("3_feb5d")]
+modulate = Color(1, 0.17854136, 0.63843215, 1)
+position = Vector2(461, 438)
+scale = Vector2(0.5, 0.5)
+texture = SubResource("CompressedTexture2D_7jktm")
+
+[node name="UI Layer" type="CanvasLayer" parent="."]
+
+[node name="TurnUI" type="Control" parent="UI Layer"]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_top = 999.0
+offset_right = 723.0
+offset_bottom = 1277.0
+
+[node name="MoveButton" type="Button" parent="UI Layer/TurnUI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 17.897001
+anchor_bottom = 31.968002
+offset_left = 44.0
+offset_top = -3.0
+offset_right = -12724.532
+offset_bottom = -8813.1045
+theme_override_font_sizes/font_size = 50
+text = "Move"
+
+[node name="ConfirmMoveButton" type="Button" parent="UI Layer/TurnUI"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 17.897001
+anchor_bottom = 31.968002
+offset_left = 49.0
+offset_top = 102.0
+offset_right = -12687.532
+offset_bottom = -8708.1045
+theme_override_font_sizes/font_size = 50
+text = "Confirm"

@@ -1,0 +1,35 @@
+[gd_scene load_steps=4 format=3 uid="uid://bho2wdif4ck7u"]
+
+[ext_resource type="PackedScene" uid="uid://crsupvt0rlyq5" path="res://board.tscn" id="1_80nbo"]
+[ext_resource type="Script" uid="uid://c35vdxxlg7ot5" path="res://game.gd" id="1_e2o6t"]
+[ext_resource type="PackedScene" uid="uid://b4gkp3c6dqwpt" path="res://Knight.tscn" id="3_feb5d"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_e2o6t")
+
+[node name="Board" parent="." instance=ExtResource("1_80nbo")]
+position = Vector2(360, 640)
+scale = Vector2(4, 4)
+
+[node name="Knight" parent="." instance=ExtResource("3_feb5d")]
+position = Vector2(472.99997, 725)
+scale = Vector2(0.5, 0.5)
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 999.0
+offset_right = 723.0
+offset_bottom = 1277.0
+
+[node name="Button" type="Button" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 17.897001
+anchor_bottom = 31.968002
+offset_left = 44.0
+offset_top = -3.0
+offset_right = -12724.532
+offset_bottom = -8813.1045
+theme_override_font_sizes/font_size = 50
+text = "Move"

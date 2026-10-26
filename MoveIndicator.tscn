@@ -1,0 +1,52 @@
+[gd_scene load_steps=5 format=3 uid="uid://4tcr1xvnyqk1"]
+
+[ext_resource type="Texture2D" uid="uid://cf75orsv1kh8e" path="res://icon.svg" id="1_h78kh"]
+
+[sub_resource type="Animation" id="Animation_h78kh"]
+resource_name = "blink"
+length = 0.75
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.7, 0.3]
+}
+
+[sub_resource type="Animation" id="Animation_c61ge"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.58431375]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_235in"]
+_data = {
+&"RESET": SubResource("Animation_c61ge"),
+&"blink": SubResource("Animation_h78kh")
+}
+
+[node name="MoveIndicator" type="Sprite2D"]
+modulate = Color(1.7602391, 1.3958757, 0, 0.58431375)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_h78kh")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_235in")
+}
+autoplay = "blink"
