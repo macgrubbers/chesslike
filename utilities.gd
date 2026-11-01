@@ -19,21 +19,21 @@ func is_in_bounds(point:Vector2):
 
 
 # Coverts grid (1-D Array) coords to global (Vector2) coords
-func grid_to_global(idx:int):
+func index_to_global(idx:int):
 	var grid_coords:Vector2
-	grid_coords = grid_to_vector(idx)
+	grid_coords = index_to_vector(idx)
 	var x = (board_origin[0] + (grid_coords[0] * tile_size * board_scale))
 	var y = (board_origin[1] - (grid_coords[1] * tile_size * board_scale))
 	return Vector2(x,y)
 
 
 # Convert global (Vector2) coords to grid (1-D Array) coords
-func global_to_grid(coords:Vector2):
-	return vector_to_grid(global_to_vector(coords))
+func global_to_index(coords:Vector2):
+	return vector_to_index(global_to_vector(coords))
 
 
 # Convert grid (1-D Array) coords to global (Vector2) coords
-func grid_to_vector(idx:int):
+func index_to_vector(idx:int):
 	var grid_coords:Vector2
 	@warning_ignore("integer_division")
 	grid_coords[1] = int(idx / 8)
@@ -41,7 +41,7 @@ func grid_to_vector(idx:int):
 	return grid_coords
 
 # Convert Vector (Vector2) coords to grid (1-D Array) coords
-func vector_to_grid(coords:Vector2):
+func vector_to_index(coords:Vector2):
 	return coords[0] + coords[1] * 8
 
 func global_to_vector(coords:Vector2):

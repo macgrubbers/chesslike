@@ -1,10 +1,10 @@
 class_name Knight extends Sprite2D
 
-var data:PieceData
+var piece_id:int
 
 
-func _init(new_data:PieceData) -> void:
-	data = new_data
+func _init(new_id:int) -> void:
+	piece_id = new_id
 	texture = load("res://icon.svg")
 	scale = Vector2(0.4,0.4)
 

@@ -1,15 +1,15 @@
 extends Node
 
-@onready var piece_manager = $"../../PieceManager"
-@onready var turn_manager = $"../../TurnManager"
+@onready var board_manager = $"../../BoardManager"
+@onready var game_loop_manager = $"../../GameLoopManager"
 
 
 # Call this from your main game logic to get the best move
 func get_best_move(game_state:GameState, max_depth: int) -> int:
 	var best_move: Array[int]
 	var best_val: float = INF
-	var current_piece:PieceData = game_state.turn_order[0]
-	print("Current piece at ", Utilities.grid_to_vector(current_piece.index))
+	var current_piece:PieceData # = game_state.turn_order[0]
+	print("Current piece at ", Utilities.index_to_vector(current_piece.index))
 	
 	# Get all valid moves for the playing piece
 	for move:int in current_piece.possible_moves[current_piece.index]:
@@ -17,14 +17,16 @@ func get_best_move(game_state:GameState, max_depth: int) -> int:
 		current_piece = game_state_copy.turn_order[0]
 		# 1. Create a simulated board state
 		# TODO: move via index maybe
-		var overlap_piece = piece_manager.move_piece_to_idx(game_state_copy.board, current_piece, move)
-		if overlap_piece: # Damage the piece, or kill it in this case
-			piece_manager.kill_piece(game_state_copy, overlap_piece)
+		var move_again = board_manager.move_piece_to_idx(game_state_copy, current_piece, move)
+		var move_val:float
+
+		# Evaluate the branch
+		if move_again:
+			move_val = minimax(game_state_copy, max_depth, -INF, INF, false)
+		else:
+			move_val = minimax(game_state_copy, max_depth - 1, -INF, INF, true)
 		
-		# Evaluate this move branch
-		# We should ALWAYS be minimizing here first, as the predicting piece should be the computer
-		var move_val = minimax(game_state_copy, max_depth - 1, -INF, INF, true)
-		
+
 		# Track highest score option(s)
 		if move_val <= best_val and move_val != INF:
 			if move_val < best_val:
@@ -38,8 +40,8 @@ func get_best_move(game_state:GameState, max_depth: int) -> int:
 # Minimax with alpha-beta pruning
 func minimax(game_state:GameState, depth: int, alpha: float, beta: float, is_maximizing: bool) -> float:
 	var game_state_copy:GameState = game_state.make_copy()
-	turn_manager.progress_turn_order(game_state_copy.turn_order)
-	var current_piece:PieceData = game_state_copy.turn_order[0]
+	game_loop_manager.progress_turn_order(game_state_copy.turn_order)
+	var current_piece:PieceData # = game_state_copy.turn_order[0]
 	
 	# Leaf node check: Stop if game is over or we reached our max tree depth
 	var win_condition:int = sim_check_game_over(game_state_copy)
@@ -52,11 +54,13 @@ func minimax(game_state:GameState, depth: int, alpha: float, beta: float, is_max
 	if is_maximizing:
 		var max_eval: float = -INF
 		for move in current_piece.possible_moves[current_piece.index]:
-			var overlap_piece = piece_manager.move_piece_to_idx(game_state_copy.board, current_piece, move)
-			if overlap_piece: # Damage the piece, or kill it in this case
-				piece_manager.kill_piece(game_state_copy, overlap_piece)
+			var move_again = board_manager.move_piece_to_idx(game_state_copy, current_piece, move)
+			var move_val:float
+			if move_again: # Damage the piece, or kill it in this case
+				move_val = minimax(game_state_copy, depth, alpha, beta, true)
+			else:
+				move_val = minimax(game_state_copy, depth - 1, alpha, beta, false)
 			
-			var move_val = minimax(game_state_copy, depth - 1, alpha, beta, false)
 			max_eval = max(max_eval, move_val)
 			
 			# Alpha-Beta Pruning: Chop off unnecessary tree branches
@@ -69,11 +73,12 @@ func minimax(game_state:GameState, depth: int, alpha: float, beta: float, is_max
 		var min_eval: float = INF
 		for move in current_piece.possible_moves[current_piece.index]:
 			#var sim_board = make_sim_board(board)
-			var overlap_piece = piece_manager.move_piece_to_idx(game_state_copy.board, current_piece, move)
-			if overlap_piece: # Damage the piece, or kill it in this case
-				piece_manager.kill_piece(game_state_copy, overlap_piece)
-
-			var move_val = minimax(game_state_copy, depth - 1, alpha, beta, true)
+			var move_again = board_manager.move_piece_to_idx(game_state_copy, current_piece, move)
+			var move_val:float
+			if move_again: # Damage the piece, or kill it in this case
+				move_val = minimax(game_state_copy, depth, alpha, beta, false)
+			else:
+				move_val = minimax(game_state_copy, depth - 1, alpha, beta, true)
 
 			min_eval = min(min_eval, move_val)
 			
