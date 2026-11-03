@@ -8,16 +8,16 @@ var bitboard:Array
 @onready var active_indicators:Array =[]
 
 @onready var knight = preload("res://Knight.tscn")
-@onready var space_indicator:PackedScene = load("res://MoveIndicator.tscn")
-
+@onready var move_indicator:PackedScene = load("res://MoveIndicator.tscn")
+@onready var attack_indicator:PackedScene = load("res://AttackIndicator.tscn")
 
 func _ready() -> void:
 	bitboard.resize(width * height)
 
 
 func setup(game_state:GameState):
-	for idx in game_state.type_id.size():
-		if game_state.type_id[idx] == 1:
+	for idx in game_state.type.size():
+		if game_state.type[idx] == 1:
 			var new_piece = Knight.new(game_state.piece_id[idx])
 			get_tree().current_scene.add_child(new_piece)
 			new_piece.set_global_position(Utilities.index_to_global(idx))
@@ -39,9 +39,13 @@ func erase_piece(piece_id:int):
 			piece.queue_free()
 
 
-func create_indicators(at_idx:int):
+func create_indicators(type:String, at_idx:int):
 	var indicator_global_pos = Utilities.index_to_global(at_idx)
-	var new_indicator = space_indicator.instantiate()
+	var new_indicator
+	if type == "Move":
+		new_indicator = move_indicator.instantiate()
+	else:
+		new_indicator = attack_indicator.instantiate()
 	get_tree().current_scene.add_child(new_indicator)
 	new_indicator.set_global_position(indicator_global_pos)
 	active_indicators.append(new_indicator)

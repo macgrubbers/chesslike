@@ -4,17 +4,19 @@ var game_state:GameState
 var move_data:MoveData
 
 var piece_idx:int
-var piece_type_id:int
+var piece_type:int
 var num_moves:int
+var num_actions:int
 var legal_moves:Array
+var legal_attacks:Array
 var active_indicators:Array = []
 var moving:bool = false
+var attacking:bool = false
 var force_move:bool = false
 
 # references
 @onready var visuals = $"../Visuals"
 @onready var turn_ui = $"../UI Layer/TurnUI"
-@onready var space_indicator:PackedScene = load("res://MoveIndicator.tscn")
 @onready var board_manager = $"../BoardManager"
 
 # signals
@@ -27,21 +29,38 @@ func on_player_turn(game_state_in:GameState, move_data_in:MoveData):
 	game_state = game_state_in
 	move_data = move_data_in
 	piece_idx = game_state.turn_order[0]
-	piece_type_id = game_state.type_id[piece_idx]
+	piece_type = game_state.type[piece_idx]
 	num_moves = game_state.num_moves[piece_idx]
+	num_actions = game_state.num_actions[piece_idx]
 	turn_ui.show()
 
 func _on_move_pressed():
 	moving = !moving
+	attacking = false
+	visuals.remove_indicators()
+
 	if (!moving or num_moves <= 0):
 		visuals.remove_indicators()
 		return
 		
-	legal_moves = move_data.piece_move_dictionary[piece_type_id][piece_idx]
-	var type_id = game_state.type_id[piece_idx]
-	var possible_moves = move_data.piece_move_dictionary[type_id]
+	legal_moves = move_data.piece_move_dictionary[piece_type][piece_idx]
+	var type = game_state.type[piece_idx]
+	var possible_moves = move_data.piece_move_dictionary[type]
 	for move_idx in possible_moves[piece_idx]:
-		visuals.create_indicators(move_idx)
+		visuals.create_indicators("Move", move_idx)
+
+
+func _on_attack_pressed():
+	attacking = !attacking
+	moving = false
+	visuals.remove_indicators()
+	if (!attacking or num_actions <= 0):
+		visuals.remove_indicators()
+		return
+	
+	legal_attacks = move_data.piece_attacks_dictionary[piece_type][piece_idx]
+	for attack_idx in legal_attacks:
+		visuals.create_indicators("Attack", attack_idx)
 
 
 func _on_end_turn_pressed():
@@ -60,7 +79,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		#print("pause!")
 		#get_tree().paused = !get_tree().paused
 
-	if !moving and !force_move:
+	if !moving and !attacking:
 		return
 	#
 	########################
@@ -73,15 +92,25 @@ func _unhandled_input(event: InputEvent) -> void:
 			# Calculate the grid coordinate (0 to 7)
 		var clicked_square:int = Utilities.global_to_index(local_mouse_pos)
 
-		if legal_moves.has(clicked_square):
-			
-			board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square)
-			
+		if moving and legal_moves.has(clicked_square):
+			board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square, false)
 			visuals.update_piece(game_state.piece_id[clicked_square], clicked_square)
 			visuals.remove_indicators()
 			
-			piece_idx = clicked_square
+			piece_idx = game_state.turn_order[0]
+			piece_type = game_state.type[piece_idx]
+			num_moves = game_state.num_moves[piece_idx]
+			num_actions = game_state.num_actions[piece_idx]
+			
 			num_moves -= 1
-			
 			moving = !moving
+			return
+		
+		if attacking and legal_attacks.has(clicked_square):
+			board_manager.attack_piece(game_state,piece_idx, clicked_square, false, false)
+			visuals.remove_indicators()
 			
+			piece_idx = clicked_square
+			num_actions -= 1
+			
+			attacking = !attacking

@@ -8,7 +8,7 @@ var turn_order: PackedInt32Array ## The piece's place in the turn order
 
 ## Piece data
 var piece_id: PackedInt32Array ## Unique ID of each piece
-var type_id: PackedInt32Array ## Type ID of the piece
+var type: PackedInt32Array ## Type ID of the piece
 var values: PackedInt32Array ## score value of the piece for minimax
 var health: PackedInt32Array ## health points of the piece
 var num_moves: PackedInt32Array	## number of moves a piece can do
@@ -24,16 +24,17 @@ PASSIVE ABILITIES bit flags
 1 - knight's double jump ability
 '''
 
-func clone()->GameState:
-	var copy = GameState.new()
-	copy.turn_order = turn_order.duplicate()
-	copy.piece_id = piece_id.duplicate()
-	copy.type_id = type_id.duplicate()
-	copy.values = values.duplicate()
-	copy.health = health.duplicate()
-	copy.num_moves = num_moves.duplicate()
-	copy.num_actions = num_actions.duplicate()
+func copy()->GameState:
+	var new_copy = GameState.new()
+	new_copy.turn_order = turn_order.duplicate()
+	new_copy.piece_id = piece_id.duplicate()
+	new_copy.type = type.duplicate()
+	new_copy.values = values.duplicate()
+	new_copy.health = health.duplicate()
+	new_copy.num_moves = num_moves.duplicate()
+	new_copy.num_actions = num_actions.duplicate()
+	new_copy.passive_abilities = passive_abilities.duplicate()
 	#copy.attack = attack.duplicate()
 	#copy.armor = armor.duplicate()
 	#copy.statuses = statuses.duplicate()
-	return copy
+	return new_copy
