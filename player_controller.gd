@@ -35,8 +35,9 @@ func on_player_turn(game_state_in:GameState, move_data_in:MoveData):
 	turn_ui.show()
 
 func _on_move_pressed():
-	moving = !moving
-	attacking = false
+	if !force_move:
+		moving = !moving
+		attacking = false
 	visuals.remove_indicators()
 
 	if (!moving or num_moves <= 0):
@@ -93,7 +94,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var clicked_square:int = Utilities.global_to_index(local_mouse_pos)
 
 		if moving and legal_moves.has(clicked_square):
-			board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square, false)
+			force_move = board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square, false)
 			visuals.update_piece(game_state.piece_id[clicked_square], clicked_square)
 			visuals.remove_indicators()
 			
@@ -102,9 +103,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			num_moves = game_state.num_moves[piece_idx]
 			num_actions = game_state.num_actions[piece_idx]
 			
-			num_moves -= 1
-			moving = !moving
-			return
+			if !force_move:
+				num_moves -= 1
+				moving = !moving
+				return
+			else:
+				_on_move_pressed()
 		
 		if attacking and legal_attacks.has(clicked_square):
 			board_manager.attack_piece(game_state,piece_idx, clicked_square, false, false)

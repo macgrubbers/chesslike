@@ -14,14 +14,14 @@ var health: PackedInt32Array ## health points of the piece
 var num_moves: PackedInt32Array	## number of moves a piece can do
 var num_actions: PackedInt32Array ## number of actions a piece can do
 var passive_abilities: PackedInt32Array ## passive abilities a piece has
-#var attack: PackedInt32Array ## attack points of the piece
+var attack_damage: PackedInt32Array ## attack points of the piece
 #var armor: PackedInt32Array ## armor points of the piece
 #var statuses: PackedInt32Array
 
 '''
 PASSIVE ABILITIES bit flags
 0 - none
-1 - knight's double jump ability
+1 - knight's move-attack "double jump"
 '''
 
 func copy()->GameState:
@@ -34,7 +34,7 @@ func copy()->GameState:
 	new_copy.num_moves = num_moves.duplicate()
 	new_copy.num_actions = num_actions.duplicate()
 	new_copy.passive_abilities = passive_abilities.duplicate()
-	#copy.attack = attack.duplicate()
+	new_copy.attack_damage = attack_damage.duplicate()
 	#copy.armor = armor.duplicate()
 	#copy.statuses = statuses.duplicate()
 	return new_copy

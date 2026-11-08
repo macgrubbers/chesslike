@@ -18,7 +18,8 @@ func _ready() -> void:
 func setup(game_state:GameState):
 	for idx in game_state.type.size():
 		if game_state.type[idx] == 1:
-			var new_piece = Knight.new(game_state.piece_id[idx])
+			var player_owned = (false if game_state.values[idx] > 0 else true)
+			var new_piece = Knight.new(game_state.piece_id[idx], player_owned)
 			get_tree().current_scene.add_child(new_piece)
 			new_piece.set_global_position(Utilities.index_to_global(idx))
 			new_piece.add_to_group("Pieces")
@@ -26,11 +27,13 @@ func setup(game_state:GameState):
 
 # Given a piece data reference, find its corresponding visual object
 #	and update it
+# TODO: animate piece if given a move chain
 func update_piece(piece_id:int, new_idx:int):
 	for piece:Knight in get_tree().get_nodes_in_group("Pieces"):
 		if piece.piece_id == piece_id and piece_id != 0:
 			var new_pos = Utilities.index_to_global(new_idx)
 			piece.set_global_position(new_pos)
+
 
 
 func erase_piece(piece_id:int):

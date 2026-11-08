@@ -13,6 +13,15 @@ var tile_values_dictionary:Dictionary[int,PackedInt32Array] = {
 		10, 15, 25, 25, 25, 25, 15, 10,
 		10, 15, 15, 15, 15, 15, 15, 10,
 		10, 10, 10, 10, 10, 10, 10, 10,]
+		,
+	2: [10, 10, 10, 10, 10, 10, 10, 10,
+		10, 15, 15, 15, 15, 15, 15, 10,
+		10, 15, 25, 25, 25, 25, 15, 10,
+		10, 15, 25, 35, 35, 25, 15, 10,
+		10, 15, 25, 35, 35, 25, 15, 10,
+		10, 15, 25, 25, 25, 25, 15, 10,
+		10, 15, 15, 15, 15, 15, 15, 10,
+		10, 10, 10, 10, 10, 10, 10, 10,]
 }
 
 # TODO: maybe have an input file
@@ -20,6 +29,8 @@ var base_moves:Dictionary = {
 	1 : [Vector2(-2, -1), Vector2(-2, 1), Vector2(2, -1), Vector2(2, 1),
 		 Vector2(-1, -2), Vector2(-1, 2), Vector2(1, -2), Vector2(1, 2),
 		 Vector2(2,0), Vector2(0,2), Vector2(-2,0), Vector2(0,-2)]
+	,
+	2 : [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)]
 }
 
 '''
@@ -27,7 +38,8 @@ Base Attacks
 1 : Cross/Plus, four tiles
 '''
 var base_attacks:Dictionary = {
-	1: [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)]
+	1: [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)],
+	2 : [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)]
 }
 
 

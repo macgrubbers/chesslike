@@ -1,6 +1,6 @@
 extends Node
 
-var piece_idx
+var index:int
 var active_indicators:Array
 
 # References
@@ -15,21 +15,23 @@ var active_indicators:Array
 signal turn_over
 
 func on_opponent_turn(game_state:GameState, move_data:MoveData):
-	piece_idx = game_state.turn_order[0]
-	var type = game_state.type[piece_idx]
+	index = game_state.turn_order[0]
+	var id = game_state.piece_id[index]
+	var type = game_state.type[index]
 	var possible_moves = move_data.piece_move_dictionary[type]
 
-	for move_idx in possible_moves[piece_idx]:
+	for move_idx in possible_moves[index]:
 		visuals.create_indicators("Move", move_idx)
 
 	await get_tree().create_timer(1).timeout # TODO: remove, just for show rn
 	
 	var start_time = Time.get_ticks_usec()
-	var best_move = ai.get_best_move(game_state, move_data, 5)
+	#var best_move = ai.get_best_move(game_state, move_data, 5)
+	var best_move_chain = $OpponentAI2.get_best_move(game_state, move_data)
 	print("Minimax ran in ", (Time.get_ticks_usec() - start_time), " ms")
+	var final_idx = board_manager.execute_move_chain(best_move_chain, game_state, index, false)
 
-	board_manager.move_piece_to_idx(game.game_state, piece_idx, best_move, false)
-	visuals.update_piece(game_state.piece_id[best_move], best_move)
+	visuals.update_piece(game_state.piece_id[final_idx], final_idx)
 
 	end_turn()
 

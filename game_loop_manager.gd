@@ -18,20 +18,25 @@ func run_game_loop_manager(game_state:GameState, move_data:MoveData):
 	while !game_over:
 		var playing_piece_idx:int = game_state.turn_order[0]
 		if game_state.values[playing_piece_idx] < 0:
-			turn_label.text = "Current Turn: Player"
+			turn_label.text = "Current Turn:\n Player"
 			on_player_turn(game_state, move_data)
 			await player_controller.turn_over
 		elif game_state.values[playing_piece_idx] > 0:
-			turn_label.text = "Current Turn: Opponent"
+			turn_label.text = "Current Turn:\n Opponent"
 			on_opponent_turn(game_state, move_data)
 			await opponent_controller.turn_over
 		else:
 			push_error("ERROR: Current piece value is zero, is this the wrong index?")
 		
 		# replenish piece moves if they're depleted
-
+		
+		for i in game_state.health.size():
+			var health = game_state.health[i]
+			if health > 0:
+				print(health)
+		
 		progress_turn_order(game_state.turn_order)
-		#check_win_conditions()
+		check_win_conditions(game_state)
 		verifications()
 		await get_tree().create_timer(1).timeout
 	
@@ -53,20 +58,28 @@ func verifications():
 	
 # Check if win condition has been met
 # TODO: alternate win conditions?
-func check_win_conditions():
-	if board_manager.get_player_pieces_value() == 0:
+func check_win_conditions(game_state:GameState):
+	var num_opponent:int = 0
+	var num_player:int = 0
+	for idx in game_state.turn_order:
+		if game_state.values[idx] > 0:
+			num_opponent += 1
+		else:
+			num_player += 1
+		
+	if num_player == 0:
 		game_result = results.OPPONENT_WIN
 		game_over = true
-		turn_label.text = "Current Turn: OPPONENT WINS"
+		turn_label.text = "Current Turn:\n OPPONENT WINS"
 		return
 
-	if board_manager.get_opponent_pieces_value() == 0:
+	if num_opponent == 0:
 		game_result = results.PLAYER_WIN
 		game_over = true
-		turn_label.text = "Current Turn: PLAYER WINS"
+		turn_label.text = "Current Turn:\n PLAYER WINS"
 		return
-
 	return
+
 
 # Pop the first item and add it to the back of the queue
 func progress_turn_order(turn_order:PackedInt32Array):

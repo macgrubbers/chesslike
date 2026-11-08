@@ -38,7 +38,7 @@ func _ready() -> void:
 	await get_tree().create_timer(1).timeout
 	await game_loop_manager.run_game_loop_manager(game_state, move_data)
 	await get_tree().create_timer(1.5).timeout
-	get_tree().quit()
+	#get_tree().reload_current_scene()
 
 
 # TODO: Read from a JSON file instead
@@ -48,6 +48,7 @@ func setup():
 	var array_size = 64
 	#game_state.tile_ids.resize(array_size)
 	game_state.turn_order.resize(array_size)
+	game_state.attack_damage.resize(array_size)
 	game_state.piece_id.resize(array_size)
 	game_state.type.resize(array_size)
 	game_state.values.resize(array_size)
