@@ -1,0 +1,12 @@
+[gd_scene load_steps=4 format=3 uid="uid://b4gkp3c6dqwpt"]
+
+[ext_resource type="Texture2D" uid="uid://cf75orsv1kh8e" path="res://icon.svg" id="1_m0yu3"]
+[ext_resource type="Script" uid="uid://dydjvkmwngd4i" path="res://chess_piece.gd" id="2_lieal"]
+[ext_resource type="PackedScene" uid="uid://b3mygm0hpi86t" path="res://HealthBar.tscn" id="3_8gaat"]
+
+[node name="Sprite2D" type="Sprite2D"]
+texture = ExtResource("1_m0yu3")
+script = ExtResource("2_lieal")
+
+[node name="HealthBar" parent="." instance=ExtResource("3_8gaat")]
+z_index = 1

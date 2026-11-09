@@ -13,6 +13,7 @@ var active_indicators:Array = []
 var moving:bool = false
 var attacking:bool = false
 var force_move:bool = false
+var use_temp_piece:bool = false
 
 # references
 @onready var visuals = $"../Visuals"
@@ -24,6 +25,11 @@ signal turn_over()
 
 func _ready() -> void:
 	pass
+
+
+func _physics_process(delta: float) -> void:
+	print(Utilities.global_to_index(get_viewport().get_mouse_position()))
+
 
 func on_player_turn(game_state_in:GameState, move_data_in:MoveData):
 	game_state = game_state_in
@@ -45,8 +51,8 @@ func _on_move_pressed():
 		return
 		
 	legal_moves = move_data.piece_move_dictionary[piece_type][piece_idx]
-	var type = game_state.type[piece_idx]
-	var possible_moves = move_data.piece_move_dictionary[type]
+	#var type = game_state.type[piece_idx]
+	var possible_moves = move_data.piece_move_dictionary[piece_type]
 	for move_idx in possible_moves[piece_idx]:
 		visuals.create_indicators("Move", move_idx)
 
@@ -94,20 +100,24 @@ func _unhandled_input(event: InputEvent) -> void:
 		var clicked_square:int = Utilities.global_to_index(local_mouse_pos)
 
 		if moving and legal_moves.has(clicked_square):
-			force_move = board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square, false)
-			visuals.update_piece(game_state.piece_id[clicked_square], clicked_square)
+			force_move = board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square, false, use_temp_piece)
+			visuals.update_piece(game_state, clicked_square)
 			visuals.remove_indicators()
 			
-			piece_idx = game_state.turn_order[0]
-			piece_type = game_state.type[piece_idx]
-			num_moves = game_state.num_moves[piece_idx]
-			num_actions = game_state.num_actions[piece_idx]
+
 			
 			if !force_move:
+				use_temp_piece = false
+				piece_idx = game_state.turn_order[0]
+				piece_type = game_state.type[piece_idx]
+				num_moves = game_state.num_moves[piece_idx]
+				num_actions = game_state.num_actions[piece_idx]
 				num_moves -= 1
 				moving = !moving
 				return
-			else:
+			else: # on double jump, save temp location
+				piece_idx = clicked_square
+				use_temp_piece = true
 				_on_move_pressed()
 		
 		if attacking and legal_attacks.has(clicked_square):

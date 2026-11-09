@@ -1,6 +1,7 @@
 extends Node
 
 var move_dictionary:Dictionary
+var distance_scoring_dictionary:Dictionary
 var attack_dictionary:Dictionary
 var tile_vals_dictionary:Dictionary
 
@@ -13,12 +14,42 @@ var bad_combos:int = 0
 
 
 ## Gives the current board a score
+# Score is calculated as:
+# 	value * health + proximity
 func score_board(state:GameState):
 	var board_val:int = 0
+	var player_count:Array
+	var opponent_count:Array
+	
+	# Gather player and opponent indexes
 	for i in state.values.size():
-		if state.piece_id[i] != 0:
-			var tile_sign = (-1 if state.values[i] < 0 else 1)
-			board_val += ((state.values[i]*state.health[i]) + (tile_vals_dictionary[state.type[i]][i]) * tile_sign)
+		var val = state.values[i]
+		if val != 0:
+			board_val += val * state.health[i]
+			if state.values[i] < 0:
+				player_count.append(i) 
+			else:
+				opponent_count.append(i) 
+	
+	# Proximity score
+	for i in state.values.size():
+		var val = state.values[i]
+		if val < 0: # Player piece
+			var player_pos = Utilities.index_to_vector(i)
+			var player_type = state.type[i]
+			for opp_idx in opponent_count: # loop through enemies for proximity
+				var opp_pos = Utilities.index_to_vector(opp_idx)
+				var dist_to_player:int = player_pos.distance_to(opp_pos)
+				board_val += distance_scoring_dictionary[player_type][dist_to_player]
+
+		elif val > 0: # Opponent piece
+			var enemy_pos = Utilities.index_to_vector(i)
+			var opp_type = state.type[i]
+			for opp_idx in opponent_count: # loop through enemies for proximity
+				var opp_pos = Utilities.index_to_vector(opp_idx)
+				var dist_to_opp:int = enemy_pos.distance_to(opp_pos)
+				board_val += distance_scoring_dictionary[opp_type][dist_to_opp]
+
 	return board_val
 
 '''
@@ -28,6 +59,7 @@ Move chains are then executed and scored
 '''
 func get_best_move(game_state_in:GameState, move_data_in:MoveData):
 	move_dictionary = move_data_in.piece_move_dictionary.duplicate()
+	distance_scoring_dictionary = move_data_in.distance_scoring_dictionary.duplicate()
 	attack_dictionary = move_data_in.piece_attacks_dictionary.duplicate()
 	tile_vals_dictionary = move_data_in.tile_values_dictionary.duplicate()
 

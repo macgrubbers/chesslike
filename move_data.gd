@@ -24,6 +24,14 @@ var tile_values_dictionary:Dictionary[int,PackedInt32Array] = {
 		10, 10, 10, 10, 10, 10, 10, 10,]
 }
 
+# Values based on distance
+## TODO: use a curve or function instead?
+var distance_scoring_dictionary:Dictionary = {
+	1: [0, 5, 5, 4, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+	2: [0 ,5, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+}
+
+
 # TODO: maybe have an input file
 var base_moves:Dictionary = {
 	1 : [Vector2(-2, -1), Vector2(-2, 1), Vector2(2, -1), Vector2(2, 1),

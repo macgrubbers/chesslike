@@ -31,7 +31,7 @@ func on_opponent_turn(game_state:GameState, move_data:MoveData):
 	print("Minimax ran in ", (Time.get_ticks_usec() - start_time), " ms")
 	var final_idx = board_manager.execute_move_chain(best_move_chain, game_state, index, false)
 
-	visuals.update_piece(game_state.piece_id[final_idx], final_idx)
+	visuals.update_piece(game_state, final_idx)
 
 	end_turn()
 

@@ -15,6 +15,13 @@ var num_moves: PackedInt32Array	## number of moves a piece can do
 var num_actions: PackedInt32Array ## number of actions a piece can do
 var passive_abilities: PackedInt32Array ## passive abilities a piece has
 var attack_damage: PackedInt32Array ## attack points of the piece
+var temp_tile: Array ## Stores a temp piece in between multi moves
+## [temp_idx, id, type, val, hp, #moves, #actions, passives, attack]
+'''
+FLAGS:
+	0 - No flag
+	1 - Double/multi jump
+'''
 #var armor: PackedInt32Array ## armor points of the piece
 #var statuses: PackedInt32Array
 
@@ -35,6 +42,7 @@ func copy()->GameState:
 	new_copy.num_actions = num_actions.duplicate()
 	new_copy.passive_abilities = passive_abilities.duplicate()
 	new_copy.attack_damage = attack_damage.duplicate()
+	new_copy.temp_tile = temp_tile.duplicate()
 	#copy.armor = armor.duplicate()
 	#copy.statuses = statuses.duplicate()
 	return new_copy

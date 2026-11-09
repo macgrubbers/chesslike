@@ -71,25 +71,22 @@ func kill_piece(game_state:GameState, idx:int):
 	game_state.piece_id[idx] = 0
 
 
-func place_piece(board:Array, piece:PieceData, vec:Vector2)->PieceData:
-	var idx = Utilities.vector_to_index(vec)
-	var overlap = board[idx]
-	board[idx] = piece
-	piece.index = idx
-	return overlap
-
-
-func move_piece_to_idx(game_state:GameState, current_idx:int, new_idx:int, is_sim:bool = true):
+func move_piece_to_idx(game_state:GameState, current_idx:int, 
+					   new_idx:int, is_sim:bool = true, use_temp_tile:bool = false):
 	var force_move_again = false
 	
-	if current_idx == new_idx: # No need to move
+	if current_idx == new_idx and !use_temp_tile: # No need to move
 		return force_move_again
+	
+	if use_temp_tile:
+		current_idx = game_state.temp_tile[0]
 	
 	var overlap = game_state.piece_id[new_idx]
 	if overlap != 0:
 		attack_piece(game_state, current_idx, new_idx, true, is_sim)
 		if game_state.passive_abilities[current_idx] == 1:
 			force_move_again = true
+			store_temp_piece(game_state, current_idx, new_idx)
 			return force_move_again
 		else:
 			pass # knockback maybe
@@ -97,25 +94,27 @@ func move_piece_to_idx(game_state:GameState, current_idx:int, new_idx:int, is_si
 	
 	
 	# Set new index values 
-	game_state.health[new_idx] = game_state.health[current_idx]
-	game_state.attack_damage[new_idx] = game_state.attack_damage[current_idx]
-	game_state.num_actions[new_idx] = game_state.num_actions[current_idx]
-	game_state.num_moves[new_idx] = game_state.num_moves[current_idx]
-	game_state.passive_abilities[new_idx] = game_state.passive_abilities[current_idx]
-	game_state.piece_id[new_idx] = game_state.piece_id[current_idx]
-	game_state.type[new_idx] = game_state.type[current_idx]
-	game_state.values[new_idx] = game_state.values[current_idx]
+	if !use_temp_tile:
+		game_state.health[new_idx] = game_state.health[current_idx]
+		game_state.attack_damage[new_idx] = game_state.attack_damage[current_idx]
+		game_state.num_actions[new_idx] = game_state.num_actions[current_idx]
+		game_state.num_moves[new_idx] = game_state.num_moves[current_idx]
+		game_state.passive_abilities[new_idx] = game_state.passive_abilities[current_idx]
+		game_state.piece_id[new_idx] = game_state.piece_id[current_idx]
+		game_state.type[new_idx] = game_state.type[current_idx]
+		game_state.values[new_idx] = game_state.values[current_idx]
 
-	# Set old index values to zero
-	game_state.health[current_idx] = 0
-	game_state.attack_damage[current_idx] = 0
-	game_state.num_moves[current_idx] = 0
-	game_state.num_actions[current_idx] = 0
-	game_state.passive_abilities[current_idx] = 0
-	game_state.piece_id[current_idx] = 0
-	game_state.type[current_idx] = 0
-	game_state.values[current_idx] = 0
-
+		# Set old index values to zero
+		game_state.health[current_idx] = 0
+		game_state.attack_damage[current_idx] = 0
+		game_state.num_moves[current_idx] = 0
+		game_state.num_actions[current_idx] = 0
+		game_state.passive_abilities[current_idx] = 0
+		game_state.piece_id[current_idx] = 0
+		game_state.type[current_idx] = 0
+		game_state.values[current_idx] = 0
+	else:
+		pop_temp_piece(game_state, new_idx)
 	# Replace the turn order's index 
 	game_state.turn_order[0] = new_idx
 	
@@ -135,6 +134,31 @@ func attack_piece(game_state:GameState, attacker_idx:int, defender_idx:int,
 			visuals.erase_piece(piece_id)
 
 
+func store_temp_piece(game_state:GameState, current_idx:int, new_idx:int):
+	game_state.temp_tile = [new_idx, game_state.piece_id[current_idx], game_state.type[current_idx], game_state.values[current_idx],
+							game_state.health[current_idx], game_state.num_moves[current_idx], game_state.num_actions[current_idx],
+							game_state.passive_abilities[current_idx], game_state.attack_damage[current_idx]]
+	## [temp_idx, id, type, val, hp, #moves, #actions, passives, attack]
+	game_state.piece_id[current_idx] = 0
+	game_state.type[current_idx] = 0
+	game_state.values[current_idx] = 0
+	game_state.health[current_idx] = 0
+	game_state.num_moves[current_idx] = 0
+	game_state.num_actions[current_idx] = 0
+	game_state.passive_abilities[current_idx] = 0
+	game_state.attack_damage[current_idx] = 0
+
+
+func pop_temp_piece(game_state:GameState, idx:int):
+	game_state.piece_id[idx] = game_state.temp_tile[1]
+	game_state.type[idx] = game_state.temp_tile[2]
+	game_state.values[idx] = game_state.temp_tile[3]
+	game_state.health[idx] = game_state.temp_tile[4]
+	game_state.num_moves[idx] = game_state.temp_tile[5]
+	game_state.num_actions[idx] = game_state.temp_tile[6]
+	game_state.passive_abilities[idx] = game_state.temp_tile[7]
+	game_state.attack_damage[idx] = game_state.temp_tile[8]
+	game_state.temp_tile = []
 
 '''
 Executes a move chain on a given game state
@@ -155,6 +179,6 @@ func execute_move_chain(chain:Array, game_state_in:GameState, idx:int, is_sim:bo
 			else:
 				chain[i+1] = -1
 		if chain[i] == 2: # Knight double jump action
-			move_piece_to_idx(game_state_in, idx, chain[i+1], is_sim)
+			move_piece_to_idx(game_state_in, idx, chain[i+1], is_sim, true)
 			end_idx = game_state_in.turn_order[0]
 	return end_idx

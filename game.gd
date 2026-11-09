@@ -4,12 +4,10 @@ var game_state:GameState
 var move_data:MoveData
 
 @onready var tile_size:int = 16
-@onready var knight = preload("res://Knight.tscn")
+@onready var knight = preload("res://ChessPiece.tscn")
 @onready var piece_data = preload("res://piece_data.gd")
 
 # References
-#@onready var player = $Knight
-#@onready var opponent = $Opponent
 @onready var visuals = $Visuals
 @onready var game_loop_manager = $GameLoopManager
 @onready var board_manager = $BoardManager
