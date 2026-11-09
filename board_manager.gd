@@ -12,14 +12,17 @@ func setup(game_state:GameState, move_data:MoveData):
 	#add_piece(game_state, move_data, Vector2(5,5), 3, 1, 1, false)
 	#add_piece(game_state, move_data, Vector2(3,6), 3, 1, 1, false)
 	#add_piece(game_state, move_data, Vector2(3,7), 3, 1, 1, false)
-	add_piece(game_state, move_data, Vector2(7,4), 3, 1, 1, false)
-	add_piece(game_state, move_data, Vector2(3,4), 5, 3, 1, true)
+	#add_piece(game_state, move_data, Vector2(7,4), 3, 1, 1, false)
+	add_piece(game_state, move_data, 2, Vector2(3,4), 5, 2, 2, true)
+	add_piece(game_state, move_data, 2, Vector2(7,4), 3, 1, 2, false)
+
 
 	
 	setup_turn_order(game_state)
 
 # TODO: maybe these are stored in a file
 func add_piece(game_state:GameState, move_data:MoveData, 
+				type:int,
 				new_pos:Vector2, new_health:int, 
 				new_attack_damage:int, ability:int, player_owned:bool):
 	var new_index:int = Utilities.vector_to_index(new_pos)
@@ -29,7 +32,7 @@ func add_piece(game_state:GameState, move_data:MoveData,
 		return # Array location is already taken
 
 	game_state.piece_id[new_index] = create_piece_id()
-	game_state.type[new_index] = 1
+	game_state.type[new_index] = type
 	game_state.values[new_index] = 500 * (-1 if player_owned else 1)
 	game_state.health[new_index] = new_health
 	game_state.attack_damage[new_index] = new_attack_damage
@@ -89,7 +92,11 @@ func move_piece_to_idx(game_state:GameState, current_idx:int,
 			store_temp_piece(game_state, current_idx, new_idx)
 			return force_move_again
 		else:
-			pass # knockback maybe
+			var current_pos = Utilities.index_to_vector(current_idx)
+			var new_pos = Utilities.index_to_vector(new_idx)
+			var knockback_dir = current_pos.direction_to(new_pos).normalized()
+			knockback_piece(game_state, new_idx, knockback_dir, is_sim)
+			
 
 	
 	
@@ -116,7 +123,7 @@ func move_piece_to_idx(game_state:GameState, current_idx:int,
 	else:
 		pop_temp_piece(game_state, new_idx)
 	# Replace the turn order's index 
-	game_state.turn_order[0] = new_idx
+	game_state.turn_order[game_state.turn_order.find(current_idx)] = new_idx
 	
 	return force_move_again
 
@@ -132,6 +139,25 @@ func attack_piece(game_state:GameState, attacker_idx:int, defender_idx:int,
 		kill_piece(game_state, defender_idx)
 		if !is_sim:
 			visuals.erase_piece(piece_id)
+
+
+func knockback_piece(game_state:GameState, idx:int, knockback_dir:Vector2, is_sim:bool):
+	var final_pos:Vector2 = Utilities.index_to_vector(idx) + knockback_dir
+	
+	# Kill piece if out of bounds
+	if !Utilities.is_in_bounds(final_pos):
+		kill_piece(game_state, idx)
+		return true
+	
+	var final_idx = Utilities.vector_to_index(final_pos)
+	
+	# Check if final knockback index is filled
+	if game_state.piece_id[final_idx] != 0:
+		return false
+	
+	#knockback the piece
+	move_piece_to_idx(game_state, idx, final_idx, is_sim)
+	return true
 
 
 func store_temp_piece(game_state:GameState, current_idx:int, new_idx:int):

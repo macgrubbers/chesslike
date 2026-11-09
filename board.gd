@@ -17,7 +17,7 @@ func _ready() -> void:
 
 func setup(game_state:GameState):
 	for idx in game_state.type.size():
-		if game_state.type[idx] == 1:
+		if game_state.type[idx] != 0:
 			var new_piece = piece_scene.instantiate()
 			new_piece.setup(game_state, idx)
 			get_tree().current_scene.add_child(new_piece)

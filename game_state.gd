@@ -21,6 +21,7 @@ var temp_tile: Array ## Stores a temp piece in between multi moves
 FLAGS:
 	0 - No flag
 	1 - Double/multi jump
+	2 - Shared Move-Attacks
 '''
 #var armor: PackedInt32Array ## armor points of the piece
 #var statuses: PackedInt32Array

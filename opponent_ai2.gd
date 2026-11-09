@@ -113,7 +113,7 @@ func assemble_move_chain(game_state:GameState, idx:int, type:int, num_moves:int,
 			new_chain.append(move)
 			
 			 # simulate knight double jump
-			if game_state.health[move] > 0:
+			if game_state.health[move] > 0 && (game_state.passive_abilities[idx] == 1):
 				for double_move in move_dictionary[type][move]:
 					var double_move_chain = new_chain.duplicate()
 					double_move_chain.append(2)
