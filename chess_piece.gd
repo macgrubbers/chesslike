@@ -7,7 +7,8 @@ var health:int
 
 var piece_dictionary:Dictionary = {
 	1 : [load("res://art/black_knight.png"), load("res://art/white_knight.png")],
-	2 : [load("res://art/black_pawn.png"), load("res://art/white_pawn.png")]
+	2 : [load("res://art/black_pawn.png"), load("res://art/white_pawn.png")],
+	3 : [load("res://art/black_king.png"), load("res://art/white_king.png")]
 }
 
 @onready var health_bar:HealthBar = $HealthBar

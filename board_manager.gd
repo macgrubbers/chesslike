@@ -9,12 +9,14 @@ extends Node
 
 func setup(game_state:GameState, move_data:MoveData):
 	# game_State, move_data, new pos, health, attack, ability, player owned
-	#add_piece(game_state, move_data, Vector2(5,5), 3, 1, 1, false)
-	#add_piece(game_state, move_data, Vector2(3,6), 3, 1, 1, false)
-	#add_piece(game_state, move_data, Vector2(3,7), 3, 1, 1, false)
-	#add_piece(game_state, move_data, Vector2(7,4), 3, 1, 1, false)
-	add_piece(game_state, move_data, 2, Vector2(3,4), 5, 2, 2, true)
-	add_piece(game_state, move_data, 2, Vector2(7,4), 3, 1, 2, false)
+	add_piece(game_state, move_data, 3,  Vector2(5,5), 6, 2, 2, false)
+	#add_piece(game_state, move_data, 2, Vector2(3,6), 3, 1, 2, false)
+	#add_piece(game_state, move_data, 2, Vector2(3,7), 3, 1, 2, false)
+	#add_piece(game_state, move_data, 2, Vector2(7,4), 3, 1, 2, false)
+	#add_piece(game_state, move_data, 2, Vector2(7,4), 3, 1, 2, false)
+	
+	# PLAYER
+	add_piece(game_state, move_data, 1, Vector2(3,4), 5, 2, 1, true)
 
 
 	
@@ -82,24 +84,26 @@ func move_piece_to_idx(game_state:GameState, current_idx:int,
 		return force_move_again
 	
 	if use_temp_tile:
-		current_idx = game_state.temp_tile[0]
+		current_idx = game_state.temp_tile[1]
 	
 	var overlap = game_state.piece_id[new_idx]
 	if overlap != 0:
 		attack_piece(game_state, current_idx, new_idx, true, is_sim)
-		if game_state.passive_abilities[current_idx] == 1:
+		if (game_state.passive_abilities[current_idx] == 1 or 
+			game_state.temp_tile[8] == 1): # Check temp tile too
 			force_move_again = true
-			store_temp_piece(game_state, current_idx, new_idx)
+			if game_state.temp_tile.size() == 0: # Update tile
+				store_temp_piece(game_state, current_idx, new_idx)
+			else: # update temp tile
+				game_state.temp_tile[1] = new_idx
 			return force_move_again
 		else:
 			var current_pos = Utilities.index_to_vector(current_idx)
 			var new_pos = Utilities.index_to_vector(new_idx)
 			var knockback_dir = current_pos.direction_to(new_pos).normalized()
 			knockback_piece(game_state, new_idx, knockback_dir, is_sim)
-			
 
-	
-	
+
 	# Set new index values 
 	if !use_temp_tile:
 		game_state.health[new_idx] = game_state.health[current_idx]
@@ -120,10 +124,10 @@ func move_piece_to_idx(game_state:GameState, current_idx:int,
 		game_state.piece_id[current_idx] = 0
 		game_state.type[current_idx] = 0
 		game_state.values[current_idx] = 0
+		game_state.turn_order[game_state.turn_order.find(current_idx)] = new_idx
 	else:
 		pop_temp_piece(game_state, new_idx)
 	# Replace the turn order's index 
-	game_state.turn_order[game_state.turn_order.find(current_idx)] = new_idx
 	
 	return force_move_again
 
@@ -161,10 +165,10 @@ func knockback_piece(game_state:GameState, idx:int, knockback_dir:Vector2, is_si
 
 
 func store_temp_piece(game_state:GameState, current_idx:int, new_idx:int):
-	game_state.temp_tile = [new_idx, game_state.piece_id[current_idx], game_state.type[current_idx], game_state.values[current_idx],
+	game_state.temp_tile = [current_idx, new_idx, game_state.piece_id[current_idx], game_state.type[current_idx], game_state.values[current_idx],
 							game_state.health[current_idx], game_state.num_moves[current_idx], game_state.num_actions[current_idx],
 							game_state.passive_abilities[current_idx], game_state.attack_damage[current_idx]]
-	## [temp_idx, id, type, val, hp, #moves, #actions, passives, attack]
+	## [current_idx, temp_idx, id, type, val, hp, #moves, #actions, passives, attack]
 	game_state.piece_id[current_idx] = 0
 	game_state.type[current_idx] = 0
 	game_state.values[current_idx] = 0
@@ -176,14 +180,15 @@ func store_temp_piece(game_state:GameState, current_idx:int, new_idx:int):
 
 
 func pop_temp_piece(game_state:GameState, idx:int):
-	game_state.piece_id[idx] = game_state.temp_tile[1]
-	game_state.type[idx] = game_state.temp_tile[2]
-	game_state.values[idx] = game_state.temp_tile[3]
-	game_state.health[idx] = game_state.temp_tile[4]
-	game_state.num_moves[idx] = game_state.temp_tile[5]
-	game_state.num_actions[idx] = game_state.temp_tile[6]
-	game_state.passive_abilities[idx] = game_state.temp_tile[7]
-	game_state.attack_damage[idx] = game_state.temp_tile[8]
+	game_state.turn_order[game_state.turn_order.find(game_state.temp_tile[0])] = idx
+	game_state.piece_id[idx] = game_state.temp_tile[2]
+	game_state.type[idx] = game_state.temp_tile[3]
+	game_state.values[idx] = game_state.temp_tile[4]
+	game_state.health[idx] = game_state.temp_tile[5]
+	game_state.num_moves[idx] = game_state.temp_tile[6]
+	game_state.num_actions[idx] = game_state.temp_tile[7]
+	game_state.passive_abilities[idx] = game_state.temp_tile[8]
+	game_state.attack_damage[idx] = game_state.temp_tile[9]
 	game_state.temp_tile = []
 
 '''

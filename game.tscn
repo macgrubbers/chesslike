@@ -13,7 +13,7 @@
 script = ExtResource("1_e2o6t")
 
 [node name="Visuals" parent="." instance=ExtResource("1_80nbo")]
-position = Vector2(417, 317)
+position = Vector2(329, 325)
 scale = Vector2(4, 4)
 
 [node name="BoardManager" type="Node" parent="."]
@@ -47,7 +47,12 @@ offset_bottom = -217.6
 metadata/_edit_use_anchors_ = true
 
 [node name="Label" type="Label" parent="UI Layer/HUD"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.1014333
+anchor_top = -0.09859157
+anchor_right = -0.09040794
+anchor_bottom = -0.09859157
 offset_left = -42.0
 offset_top = 35.0
 offset_right = 219.0
@@ -56,8 +61,22 @@ theme_override_font_sizes/font_size = 40
 text = "Current Turn: "
 metadata/_edit_use_anchors_ = true
 
+[node name="MouseLocation" type="Label" parent="UI Layer/HUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.10584344
+anchor_top = 1.0633805
+anchor_right = -0.09481808
+anchor_bottom = 1.0633805
+offset_left = -42.0
+offset_top = 35.0
+offset_right = 219.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 40
+text = "mouse"
+metadata/_edit_use_anchors_ = true
+
 [node name="TurnUI" type="Control" parent="UI Layer"]
-visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 694.0
@@ -70,10 +89,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 17.897001
 anchor_bottom = 31.968002
-offset_left = 44.0
-offset_top = -3.0
-offset_right = -12724.532
-offset_bottom = -8813.1045
+offset_left = 9.0
+offset_top = 155.0
+offset_right = -12759.532
+offset_bottom = -8655.1045
 theme_override_font_sizes/font_size = 50
 text = "Move"
 
@@ -82,10 +101,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 17.897001
 anchor_bottom = 31.968002
-offset_left = 66.0
-offset_top = 128.0
-offset_right = -12702.532
-offset_bottom = -8682.1045
+offset_left = 240.0
+offset_top = 157.0
+offset_right = -12528.532
+offset_bottom = -8653.1045
 theme_override_font_sizes/font_size = 50
 text = "Attack"
 
@@ -94,10 +113,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 17.897001
 anchor_bottom = 31.968002
-offset_left = 59.0
-offset_top = 266.0
-offset_right = -12655.532
-offset_bottom = -8544.1045
+offset_left = 103.0
+offset_top = 256.0
+offset_right = -12611.532
+offset_bottom = -8554.1045
 theme_override_font_sizes/font_size = 50
 text = "End Turn
 "

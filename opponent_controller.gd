@@ -16,7 +16,6 @@ signal turn_over
 
 func on_opponent_turn(game_state:GameState, move_data:MoveData):
 	index = game_state.turn_order[0]
-	var id = game_state.piece_id[index]
 	var type = game_state.type[index]
 	var possible_moves = move_data.piece_move_dictionary[type]
 

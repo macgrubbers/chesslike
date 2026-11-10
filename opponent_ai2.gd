@@ -98,6 +98,10 @@ func get_best_move(game_state_in:GameState, move_data_in:MoveData):
 # TODO: would be easier to just make the chain as we iterate
 func assemble_move_chain(game_state:GameState, idx:int, type:int, num_moves:int, num_attacks:int, chain:Array, chain_ok:bool):
 	var is_chain_ok = chain_ok
+	if game_state.passive_abilities[idx] == 2: # "shared" passive ability
+		var lower = min(num_moves, num_attacks)
+		num_moves = lower
+		num_attacks = lower
 	if num_moves == 0 and num_attacks == 0:
 		if is_chain_ok:
 			move_chains.append(chain)

@@ -28,26 +28,30 @@ var tile_values_dictionary:Dictionary[int,PackedInt32Array] = {
 ## TODO: use a curve or function instead?
 var distance_scoring_dictionary:Dictionary = {
 	1: [0, 5, 5, 4, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-	2: [0 ,5, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	2: [0 ,5, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	3: [0 ,5, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 }
 
 
 # TODO: maybe have an input file
 var base_moves:Dictionary = {
 	1 : [Vector2(-2, -1), Vector2(-2, 1), Vector2(2, -1), Vector2(2, 1),
-		 Vector2(-1, -2), Vector2(-1, 2), Vector2(1, -2), Vector2(1, 2),
-		 Vector2(2,0), Vector2(0,2), Vector2(-2,0), Vector2(0,-2)]
-	,
-	2 : [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)]
+		 Vector2(-1, -2), Vector2(-1, 2), Vector2(1, -2), Vector2(1, 2)],
+	2 : [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)],
+	3 : [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1),
+		 Vector2(1,1), Vector2(-1,-1), Vector2(-1,1), Vector2(1,-1)]
 }
 
 '''
 Base Attacks
-1 : Cross/Plus, four tiles
+1 : "Plus" four tiles
+2 : "X" four tiles
 '''
 var base_attacks:Dictionary = {
 	1: [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)],
-	2 : [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1)]
+	2 : [Vector2(1,1), Vector2(-1,-1), Vector2(-1,1), Vector2(1,-1)],
+	3 : [Vector2(1,0), Vector2(-1,0), Vector2(0,1), Vector2(0,-1),
+		 Vector2(1,1), Vector2(-1,-1), Vector2(-1,1), Vector2(1,-1)]
 }
 
 

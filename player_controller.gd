@@ -19,6 +19,8 @@ var use_temp_piece:bool = false
 @onready var visuals = $"../Visuals"
 @onready var turn_ui = $"../UI Layer/TurnUI"
 @onready var board_manager = $"../BoardManager"
+@onready var move_button = $"../UI Layer/TurnUI/MoveButton"
+@onready var attack_button = $"../UI Layer/TurnUI/AttackButton"
 
 # signals
 signal turn_over()
@@ -28,10 +30,16 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	print(Utilities.global_to_index(get_viewport().get_mouse_position()))
+	var mouse_idx = Utilities.global_to_index(get_viewport().get_mouse_position())
+	var mouse_vec = Utilities.index_to_vector(mouse_idx)
+	$"../UI Layer/HUD/MouseLocation".text = "Mouse pos: " + \
+		"[" + str(int(mouse_vec.x)) + ", " + str(int(mouse_vec.y)) + "]" + "\nMouse idx: " + \
+		str(int(mouse_idx))
 
 
 func on_player_turn(game_state_in:GameState, move_data_in:MoveData):
+	move_button.disabled = false
+	attack_button.disabled = false
 	game_state = game_state_in
 	move_data = move_data_in
 	piece_idx = game_state.turn_order[0]
@@ -103,9 +111,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			force_move = board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square, false, use_temp_piece)
 			visuals.update_piece(game_state, clicked_square)
 			visuals.remove_indicators()
-			
 
-			
 			if !force_move:
 				use_temp_piece = false
 				piece_idx = game_state.turn_order[0]
@@ -114,7 +120,12 @@ func _unhandled_input(event: InputEvent) -> void:
 				num_actions = game_state.num_actions[piece_idx]
 				num_moves -= 1
 				moving = !moving
-				return
+
+				if game_state.passive_abilities[piece_idx] == 2: # "shared" passive ability
+					var lower = min(num_moves, num_actions)
+					num_moves = lower
+					num_actions = lower
+
 			else: # on double jump, save temp location
 				piece_idx = clicked_square
 				use_temp_piece = true
@@ -127,4 +138,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			piece_idx = clicked_square
 			num_actions -= 1
 			
+			if game_state.passive_abilities[piece_idx] == 2: # "shared" passive ability
+				var lower = min(num_moves, num_actions)
+				num_moves = lower
+				num_actions = lower
+			
 			attacking = !attacking
+			
+	if num_moves <= 0:
+		move_button.disabled = true
+	if num_actions <= 0:
+		attack_button.disabled = true
