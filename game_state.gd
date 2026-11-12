@@ -4,6 +4,7 @@ extends RefCounted
 ## Board data
 #var tile_ids: PackedInt32Array # DO NOT COPY, for visuals
 var turn_order: PackedInt32Array ## The piece's place in the turn order
+var move_chain: Array
 #var terrain: PackedInt32Array ## Terrain type on the given tile
 
 ## Piece data
@@ -16,25 +17,19 @@ var num_actions: PackedInt32Array ## number of actions a piece can do
 var passive_abilities: PackedInt32Array ## passive abilities a piece has
 var attack_damage: PackedInt32Array ## attack points of the piece
 var temp_tile: Array ## Stores a temp piece in between multi moves
-## [temp_idx, id, type, val, hp, #moves, #actions, passives, attack]
-'''
-FLAGS:
-	0 - No flag
-	1 - Double/multi jump
-	2 - Shared Move-Attacks
-'''
-#var armor: PackedInt32Array ## armor points of the piece
-#var statuses: PackedInt32Array
+## [current_idx, temp_idx, id, type, val, hp, #moves, #actions, passives, attack]
 
 '''
-PASSIVE ABILITIES bit flags
+PASSIVE ABILITIES
 0 - none
 1 - knight's move-attack "double jump"
+2 - Shared move-attack pool
 '''
 
 func copy()->GameState:
 	var new_copy = GameState.new()
 	new_copy.turn_order = turn_order.duplicate()
+	new_copy.move_chain = move_chain.duplicate()
 	new_copy.piece_id = piece_id.duplicate()
 	new_copy.type = type.duplicate()
 	new_copy.values = values.duplicate()

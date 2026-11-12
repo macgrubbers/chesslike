@@ -29,7 +29,7 @@ func setup(game_state:GameState):
 #	and update it
 # TODO: animate piece if given a move chain
 # TODO: signals for updating health
-func update_piece(game_state:GameState, idx:int):
+func update_piece(game_state:GameState):
 	for i in game_state.piece_id.size():
 		var piece_id = game_state.piece_id[i]
 		if piece_id != 0: # square is not empty

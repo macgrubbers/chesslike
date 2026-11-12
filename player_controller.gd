@@ -109,7 +109,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 		if moving and legal_moves.has(clicked_square):
 			force_move = board_manager.move_piece_to_idx(game_state, piece_idx, clicked_square, false, use_temp_piece)
-			visuals.update_piece(game_state, clicked_square)
+			visuals.update_piece(game_state)
 			visuals.remove_indicators()
 
 			if !force_move:

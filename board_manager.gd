@@ -77,7 +77,8 @@ func kill_piece(game_state:GameState, idx:int):
 
 
 func move_piece_to_idx(game_state:GameState, current_idx:int, 
-					   new_idx:int, is_sim:bool = true, use_temp_tile:bool = false):
+					   new_idx:int, is_sim:bool = true, use_temp_tile:bool = false,
+					   use_chain:bool = false):
 	var force_move_again = false
 	
 	if current_idx == new_idx and !use_temp_tile: # No need to move
@@ -88,9 +89,11 @@ func move_piece_to_idx(game_state:GameState, current_idx:int,
 	
 	var overlap = game_state.piece_id[new_idx]
 	if overlap != 0:
-		attack_piece(game_state, current_idx, new_idx, true, is_sim)
+		# game_state, attacker_idx, defender_idx, is_sim, chain, use_chain
+		attack_piece(game_state, current_idx, new_idx, is_sim, use_chain)
+
 		if (game_state.passive_abilities[current_idx] == 1 or 
-			game_state.temp_tile[8] == 1): # Check temp tile too
+			game_state.temp_tile.size() > 1): # Check temp tile too
 			force_move_again = true
 			if game_state.temp_tile.size() == 0: # Update tile
 				store_temp_piece(game_state, current_idx, new_idx)
@@ -102,7 +105,6 @@ func move_piece_to_idx(game_state:GameState, current_idx:int,
 			var new_pos = Utilities.index_to_vector(new_idx)
 			var knockback_dir = current_pos.direction_to(new_pos).normalized()
 			knockback_piece(game_state, new_idx, knockback_dir, is_sim)
-
 
 	# Set new index values 
 	if !use_temp_tile:
@@ -133,16 +135,24 @@ func move_piece_to_idx(game_state:GameState, current_idx:int,
 
 
 func attack_piece(game_state:GameState, attacker_idx:int, defender_idx:int,
-				  is_move_attack:bool, is_sim:bool = true):
+				  is_sim:bool = true, use_chain:bool = false):
 	if attacker_idx == defender_idx:
-		return
-	game_state.health[defender_idx] -= game_state.attack_damage[attacker_idx]
+		return # no attacking ourselves, exit out
+
+	var damage = game_state.attack_damage[attacker_idx]
+	game_state.health[defender_idx] -= damage
+
+	if use_chain:
+		var new_segment = ["attack", attacker_idx, defender_idx, damage]
+		game_state.move_chain.append(new_segment)
 
 	if game_state.health[defender_idx] <= 0:
 		var piece_id = game_state.piece_id[defender_idx]
 		kill_piece(game_state, defender_idx)
-		if !is_sim:
-			visuals.erase_piece(piece_id)
+		if use_chain:
+			var new_segment = ["kill", defender_idx]
+			game_state.move_chain.append(new_segment)
+	return
 
 
 func knockback_piece(game_state:GameState, idx:int, knockback_dir:Vector2, is_sim:bool):
@@ -206,7 +216,8 @@ func execute_move_chain(chain:Array, game_state_in:GameState, idx:int, is_sim:bo
 				
 		if chain[i] == 1: # Attack action
 			if (game_state_in.health[chain[i+1]] > 0 and chain[i+1] != idx): # Is attack viable?
-				attack_piece(game_state_in,idx, chain[i+1], false, is_sim)
+				# game_state, attacker_idx, defender_idx, is_sim, chain, use_chain
+				attack_piece(game_state_in,idx, chain[i+1], is_sim)
 			else:
 				chain[i+1] = -1
 		if chain[i] == 2: # Knight double jump action

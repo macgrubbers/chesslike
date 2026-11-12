@@ -14,7 +14,8 @@ enum results{PLAYER_WIN, OPPONENT_WIN, TIE}
 @onready var turn_label:Label = $"../UI Layer/HUD/Label"
 
 
-func run_game_loop_manager(game_state:GameState, move_data:MoveData):
+func run_game_loop_manager(game_state_in:GameState, move_data:MoveData):
+	game_state = game_state_in
 	while !game_over:
 		var playing_piece_idx:int = game_state.turn_order[0]
 		if game_state.values[playing_piece_idx] < 0:
@@ -27,13 +28,6 @@ func run_game_loop_manager(game_state:GameState, move_data:MoveData):
 			await opponent_controller.turn_over
 		else:
 			push_error("ERROR: Current piece value is zero, is this the wrong index?")
-		
-		# replenish piece moves if they're depleted
-		
-		for i in game_state.health.size():
-			var health = game_state.health[i]
-			if health > 0:
-				print(health)
 		
 		progress_turn_order(game_state.turn_order)
 		check_win_conditions(game_state)

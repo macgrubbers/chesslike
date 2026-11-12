@@ -26,11 +26,11 @@ func on_opponent_turn(game_state:GameState, move_data:MoveData):
 	
 	var start_time = Time.get_ticks_usec()
 	#var best_move = ai.get_best_move(game_state, move_data, 5)
-	var best_move_chain = $OpponentAI2.get_best_move(game_state, move_data)
+	var new_game_state = $OpponentAI2.get_best_move(game_state, move_data)
 	print("Minimax ran in ", (Time.get_ticks_usec() - start_time), " ms")
-	var final_idx = board_manager.execute_move_chain(best_move_chain, game_state, index, false)
-
-	visuals.update_piece(game_state, final_idx)
+	#var final_idx = board_manager.execute_move_chain(best_move_chain, game_state, index, false)
+	visuals.update_piece(new_game_state)
+	$"../GameLoopManager".game_state = new_game_state
 
 	end_turn()
 
